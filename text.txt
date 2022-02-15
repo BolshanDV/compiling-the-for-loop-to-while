@@ -1,0 +1,6 @@
+#include <iostream>
+using namespace std;
+for(int k=i; k>0; k-=1, i--){
+       cout<<i;
+       cout<<k;
+   }

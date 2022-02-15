@@ -1,0 +1,6 @@
+#include <iostream> using namespace std; 
+int int k=i
+while( k>0 ){        cout<<i;        cout<<k;     k-=1, i--
+}
+
+ 
