@@ -18,7 +18,7 @@ using namespace std;
 //
 
 string readingFile(){
-    ifstream file("/Users/dmitrij/CLionProjects/compiling_the_for _loop _to _while/text.txt");
+    ifstream file("/Users/dmitrij/CLionProjects/compiling-the-for-loop-to-while-prod/text.txt");
     string str;
     string content; //хранится прочтенный фаил
     while (getline(file, str)) {
@@ -30,7 +30,7 @@ string readingFile(){
 
 void creatureReadyFile( string text) {
     ofstream out;
-    out.open("/Users/dmitrij/CLionProjects/compiling_the_for _loop _to _while/resultat.txt", ios::app);
+    out.open("/Users/dmitrij/CLionProjects/compiling-the-for-loop-to-while-prod/for-while.txt", ios::app);
     out << text << endl;
 };
 
@@ -58,20 +58,21 @@ Condition parserCondition (string conditionBlocFor){
     };
     return elementConditionBlock;
 };
+
 string parserBody(string body) {
     return body.substr(body.find('{') + 1, body.find('}') - body.find('{') - 1 );
 };
+
+string creatureWhileFromFor(const Condition& condition, const string& body ) {
+    return "int " + condition.initialize + "\n" + "while(" + condition.condition + " ){" + body + condition.increment + "\n}\n";
+};
+
 string parser( const string& i ) {
     string finalText, initialize, condition, increment, bodyBlocFor;
     string strCondition = i;
     string conditionBlocFor = strCondition.substr(i.find('(') + 1, i.find(')')-i.find('(') - 1 );
-    parserCondition(conditionBlocFor);
-    parserBody(i);
-    finalText.append("int " + initialize + "\n" + "while(" + condition + " ){" + bodyBlocFor + increment + "\n}\n");
-
-    return finalText;
+    return creatureWhileFromFor(parserCondition(conditionBlocFor), parserBody(i));
 };
-
 
 void processingText( string content) {
     string str;
