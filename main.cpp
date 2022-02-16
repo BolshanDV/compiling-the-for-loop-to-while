@@ -27,7 +27,6 @@ struct Condition {
      string increment;
 };
 
-
 Condition parserCondition (string conditionBlocFor){
     Condition elementConditionBlock;
     int j = 3;
@@ -36,6 +35,9 @@ Condition parserCondition (string conditionBlocFor){
         switch (j) {
             case 3: {
                 elementConditionBlock.initialize = strCondition.substr(0 ,strCondition.find(';'));
+                if (elementConditionBlock.initialize.find(',') != -1) {
+                    elementConditionBlock.initialize = elementConditionBlock.initialize.replace(strCondition.find(','), 2 , ";\n   ");
+                }
                 break;
             }
             case 2: {
@@ -47,13 +49,11 @@ Condition parserCondition (string conditionBlocFor){
                     elementConditionBlock.increment = strCondition;
                 } else {
                     elementConditionBlock.increment = strCondition.erase(strCondition.insert(strCondition.find(','), ";\n       ").find(','), 2);
-
                 }
-
                 break;
             }
         }
-        conditionBlocFor.erase(0, strCondition.find(';') + 1);
+        conditionBlocFor.erase(0, strCondition.find(';') + 2);
         j--;
     };
     return elementConditionBlock;
@@ -72,7 +72,6 @@ string parser( const string& i ) {
 };
 
 string checkCode(string str) {
-    string typeCycle;
     if (str.find("for(")  == -1){
         creatureReadyFile(str.substr(0, str.length()));
         str.clear();
@@ -95,8 +94,10 @@ string checkCode(string str) {
                     break;
                 }
                 case '\n': {
-                    parserCondition(str.substr(str.find('(') + 1, str.find(')') - str.find('(') - 1 ));
-                    typeCycle = "cycleForWithoutBody";
+                    Condition conditional = parserCondition(str.substr(str.find('(') + 1, str.find(')') - str.find('(') - 1 ));
+                    str.erase(0, str.find('\n') + 2);
+                    creatureReadyFile(creatureWhileFromFor(conditional, str.substr(0, str.find('\n') + 2 )));
+                    str.erase(0, str.find('\n') + 2 );
                     break;
                 }
             }
@@ -110,7 +111,6 @@ void processingText(  string content) {
         content = checkCode(content);
     }
 }
-
 
 int main() {
     string content = readingFile();
