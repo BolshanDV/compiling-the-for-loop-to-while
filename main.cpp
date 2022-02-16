@@ -4,19 +4,6 @@
 
 using namespace std;
 
-// TODO создать 3 структуры под 3 типа фором (ClassicFor ... etc)
-// ClassicFor = {
-// string [] conditionals = {"int i = 0, i < 3, i++"}
-// String [] bodyLines = {"some logic"} split by ";";
-//}
-
-// TODO Создать функцию, которая определяет тип for ("ClassicFor.. etc")
-// TODO Проверяешь через switch case for type и вызываешь функцию парсинга (2 функции парсинга)
-// TODO внутри ф. парсинга вызываешь 2 отдельнвых метода (extractConditionals, extractBody (logic for 2 type body))
-// TODO эти функции будут возвращать твои данные и там ты уже в свои структуры добавляешь эти данные
-// TODO 2 массива, которые содержат объекты
-//
-
 string readingFile(){
     ifstream file("/Users/dmitrij/CLionProjects/compiling-the-for-loop-to-while-prod/text.txt");
     string str;
@@ -26,9 +13,9 @@ string readingFile(){
         content.push_back('\n');
     };
     return content;
-};
+}
 
-void creatureReadyFile( string text) {
+void creatureReadyFile( const string& text) {
     ofstream out;
     out.open("/Users/dmitrij/CLionProjects/compiling-the-for-loop-to-while-prod/for-while.txt", ios::app);
     out << text << endl;
@@ -39,6 +26,7 @@ struct Condition {
      string condition;
      string increment;
 };
+
 
 Condition parserCondition (string conditionBlocFor){
     Condition elementConditionBlock;
@@ -59,7 +47,7 @@ Condition parserCondition (string conditionBlocFor){
     return elementConditionBlock;
 };
 
-string parserBody(string body) {
+string parserBody(const string& body) {
     return body.substr(body.find('{') + 1, body.find('}') - body.find('{') - 1 );
 };
 
@@ -74,22 +62,35 @@ string parser( const string& i ) {
     return creatureWhileFromFor(parserCondition(conditionBlocFor), parserBody(i));
 };
 
+//void checkCode(const string& code) {
+//    string str = code;
+//    string index;
+//    int startElement = str.find("for(");
+//    int end = str.find(')');
+//    int endElement = str.find('}');
+//
+//    for (int i = 23; i <= str.length(); i++) {
+//        if((i > end)  && (str[i] == ';')){
+//            index = str[i];
+//            break;
+//        };
+//    }
+//    if ((startElement  == -1) || (endElement == -1)){
+//        creatureReadyFile(str.substr(0, str.length()));
+//    }
+//};
+
 void processingText( string content) {
     string str;
     while (content.length() != 0) {
         str = content;
-        string index;
+
+//        checkCode(str);
 
         int startElement = str.find("for(");
         int end = str.find(')');
         int endElement = str.find('}');
 
-        for (int i = 23; i <= str.length(); i++) {
-            if((i > end)  && (content[i] == ';')){
-                index = str[i];
-                break;
-            };
-        }
         if ((startElement  == -1) || (endElement == -1)){
             creatureReadyFile(str.substr(0, str.length()));
             break;
@@ -103,12 +104,13 @@ void processingText( string content) {
 
         content.erase(0, endElement + 1);
     }
-};
+}
+
 
 int main() {
     string content = readingFile();
 
     processingText(content);
-    
+
     return 0;
 }

@@ -6,12 +6,13 @@ int main() {
 
    int i, j;
 
-   
+  
 int i=0, j=0
 while( i<56 ){
        cout<<i;
- i++
+   i++
 }
 
 
+}
 
