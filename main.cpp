@@ -34,12 +34,24 @@ Condition parserCondition (string conditionBlocFor){
     while ( j != 0) {
         string strCondition = conditionBlocFor;
         switch (j) {
-            case 3: elementConditionBlock.initialize = strCondition.substr(0 ,strCondition.find(';'));
+            case 3: {
+                elementConditionBlock.initialize = strCondition.substr(0 ,strCondition.find(';'));
                 break;
-            case 2: elementConditionBlock.condition = strCondition.substr(0 ,strCondition.find(';'));
+            }
+            case 2: {
+                elementConditionBlock.condition = strCondition.substr(0 ,strCondition.find(';'));
                 break;
-            case 1: elementConditionBlock.increment = strCondition;
+            }
+            case 1: {
+                if (strCondition.find(',') == -1){
+                    elementConditionBlock.increment = strCondition;
+                } else {
+                    elementConditionBlock.increment = strCondition.erase(strCondition.insert(strCondition.find(','), ";\n       ").find(','), 2);
+
+                }
+
                 break;
+            }
         }
         conditionBlocFor.erase(0, strCondition.find(';') + 1);
         j--;
@@ -52,65 +64,57 @@ string parserBody(const string& body) {
 };
 
 string creatureWhileFromFor(const Condition& condition, const string& body ) {
-    return "int " + condition.initialize + "\n" + "while(" + condition.condition + " ){" + body + condition.increment + "\n}\n";
+    return "    " + condition.initialize + ";\n" + "   while(" + condition.condition + " ){" + "   " + body + "   " + condition.increment + ";\n   }\n";
 };
 
 string parser( const string& i ) {
-    string finalText, initialize, condition, increment, bodyBlocFor;
-    string strCondition = i;
-    string conditionBlocFor = strCondition.substr(i.find('(') + 1, i.find(')')-i.find('(') - 1 );
-    return creatureWhileFromFor(parserCondition(conditionBlocFor), parserBody(i));
+    return creatureWhileFromFor(parserCondition(i.substr(i.find('(') + 1, i.find(')')-i.find('(') - 1 )), parserBody(i));
 };
 
-//void checkCode(const string& code) {
-//    string str = code;
-//    string index;
-//    int startElement = str.find("for(");
-//    int end = str.find(')');
-//    int endElement = str.find('}');
-//
-//    for (int i = 23; i <= str.length(); i++) {
-//        if((i > end)  && (str[i] == ';')){
-//            index = str[i];
-//            break;
-//        };
-//    }
-//    if ((startElement  == -1) || (endElement == -1)){
-//        creatureReadyFile(str.substr(0, str.length()));
-//    }
-//};
-
-void processingText( string content) {
-    string str;
-    while (content.length() != 0) {
-        str = content;
-
-//        checkCode(str);
-
-        int startElement = str.find("for(");
-        int end = str.find(')');
-        int endElement = str.find('}');
-
-        if ((startElement  == -1) || (endElement == -1)){
-            creatureReadyFile(str.substr(0, str.length()));
-            break;
+string checkCode(string str) {
+    string typeCycle;
+    if (str.find("for(")  == -1){
+        creatureReadyFile(str.substr(0, str.length()));
+        str.clear();
+    } else {
+        creatureReadyFile(str.substr(0, str.find("for(")));
+        str.erase(0, str.find("for("));
+    }
+    if (str.find("for(") < str.find(')') ) {
+        for (int i = str.find(')') + 1; i <= str.find('\n'); i++) {
+            switch (str[i]) {
+                case ';': {
+                    creatureReadyFile(creatureWhileFromFor(parserCondition(str.substr(str.find('(') + 1, str.find(')') - str.find('(') - 1 )), "\n"));
+                    i = str.find('\n') + 1;
+                    str.erase(0, str.find('\n') + 1);
+                    break;
+                }
+                case '{': {
+                    creatureReadyFile(parser(str.substr(str.find("for("), str.find('}')  - str.find("for(") + 1)));
+                    str.erase(0, str.find('}') + 1);
+                    break;
+                }
+                case '\n': {
+                    parserCondition(str.substr(str.find('(') + 1, str.find(')') - str.find('(') - 1 ));
+                    typeCycle = "cycleForWithoutBody";
+                    break;
+                }
+            }
         }
+    }
+    return str;
+};
 
-        creatureReadyFile(str.substr(0, startElement));
-
-        string forelement = parser(str.substr(startElement, endElement  - startElement + 1));
-
-        creatureReadyFile(forelement);
-
-        content.erase(0, endElement + 1);
+void processingText(  string content) {
+    while (content.length() != 0) {
+        content = checkCode(content);
     }
 }
 
 
 int main() {
     string content = readingFile();
-
     processingText(content);
-
+    cout << "Success" << endl;
     return 0;
 }

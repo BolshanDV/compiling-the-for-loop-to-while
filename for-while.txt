@@ -1,18 +1,43 @@
 #include <iostream>
 using namespace std;
-
+ 
 int main() {
    std::cout << "Hello World!\n";
-
+ 
    int i, j;
 
-  
-int i=0, j=0
-while( i<56 ){
+   int FOR;
+   
+    FOR=0;
+   while( FOR<56 ){   
+    FOR++;
+   }
+
        cout<<i;
-   i++
-}
+ 
+  int iforex;
+  
+    iforex=0;
+   while( iforex<56 ){   
+    iforex++;
+   }
+
+      cout<<i;
+ 
+   
+    int k=i;
+   while( k>0 ){   
+       cout<<i;
+       cout<<k;
+       k-=1;
+       i--;
+   }
 
 
+ 
+   while(--i);
+       cout<<j;
+ 
 }
+
 
