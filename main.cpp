@@ -6,7 +6,7 @@ using namespace std;
 string readingFile(){
     ifstream file("/Users/dmitrij/CLionProjects/compiling-the-for-loop-to-while-prod/text.txt");
     string str;
-    string content; //хранится прочтенный фаил
+    string content;
     while (getline(file, str)) {
         content += str;
         content.push_back('\n');
@@ -47,7 +47,7 @@ Condition parserCondition (string conditionBlocFor){
                 if (strCondition.find(',') == -1){
                     elementConditionBlock.increment = strCondition;
                 } else {
-                    elementConditionBlock.increment = strCondition.erase(strCondition.insert(strCondition.find(','), ";\n       ").find(','), 2);
+                    elementConditionBlock.increment = strCondition.erase(strCondition.insert(strCondition.find(','), ";\n        ").find(','), 2);
                 }
                 break;
             }
@@ -62,12 +62,19 @@ string parserBody(const string& body) {
     return body.substr(body.find('{') + 1, body.find('}') - body.find('{') - 1 );
 };
 
-string creatureWhileFromFor(const Condition& condition, const string& body ) {
-    return "    " + condition.initialize + ";\n" + "   while(" + condition.condition + " ){" + "   " + body + "   " + condition.increment + ";\n   }\n";
+string creatureWhileFromFor(const Condition& condition, string body, const string& typeLoop ) {
+    string readyLoop;
+    if (typeLoop == "body in one line") {
+        body.erase( body.find('\n'), 1);
+        readyLoop = "   " + condition.initialize + ";\n" + "   while( " + condition.condition + " ){\n" + body + "      " + condition.increment + ";\n   }";
+    } else {
+        readyLoop = "   " + condition.initialize + ";\n" + "   while( " + condition.condition + " ){" + body + "      " + condition.increment + ";\n   }";
+    }
+    return readyLoop;
 };
 
 string parser( const string& i ) {
-    return creatureWhileFromFor(parserCondition(i.substr(i.find('(') + 1, i.find(')')-i.find('(') - 1 )), parserBody(i));
+    return creatureWhileFromFor(parserCondition(i.substr(i.find('(') + 1, i.find(')')-i.find('(') - 1 )), parserBody(i), " ");
 };
 
 string checkCode(string str) {
@@ -82,20 +89,23 @@ string checkCode(string str) {
         for (int i = str.find(')') + 1; i <= str.find('\n'); i++) {
             switch (str[i]) {
                 case ';': {
-                    creatureReadyFile(creatureWhileFromFor(parserCondition(str.substr(str.find('(') + 1, str.find(')') - str.find('(') - 1 )), "\n"));
+                    //TODO Массив без тела
+                    creatureReadyFile(creatureWhileFromFor(parserCondition(str.substr(str.find('(') + 1, str.find(')') - str.find('(') - 1 )), "\n", ""));
                     i = str.find('\n') + 1;
                     str.erase(0, str.find('\n') + 1);
                     break;
                 }
                 case '{': {
+                    //TODO Массив с телом
                     creatureReadyFile(parser(str.substr(str.find("for("), str.find('}')  - str.find("for(") + 1)));
                     str.erase(0, str.find('}') + 1);
                     break;
                 }
                 case '\n': {
+                    //TODO Массив с телом в одну строчку
                     Condition conditional = parserCondition(str.substr(str.find('(') + 1, str.find(')') - str.find('(') - 1 ));
                     str.erase(0, str.find('\n') + 2);
-                    creatureReadyFile(creatureWhileFromFor(conditional, str.substr(0, str.find('\n') + 2 )));
+                    creatureReadyFile(creatureWhileFromFor(conditional, str.substr(0, str.find('\n') + 2 ), "body in one line"));
                     str.erase(0, str.find('\n') + 2 );
                     break;
                 }
